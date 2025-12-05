@@ -46,7 +46,7 @@ View your app in AI Studio: https://ai.studio/apps/drive/1moLFr1cwG3FVjsf0PGWmNT
    docker compose up app-prod
    ```
 
-2. Access the app at http://localhost:8080
+2. Access the app at http://localhost:3000
 
 ### Docker Commands
 
