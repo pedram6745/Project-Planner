@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Development service (with hot-reload)
   app-dev:
@@ -17,13 +15,13 @@ services:
     stdin_open: true
     tty: true
 
-  # Production service (without hot-reload)
+  # Production-like service (without hot-reload, different port)
   app-prod:
     build:
       context: .
     container_name: project-planner-prod
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
     command: npm run dev

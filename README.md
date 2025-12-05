@@ -46,7 +46,9 @@ View your app in AI Studio: https://ai.studio/apps/drive/1moLFr1cwG3FVjsf0PGWmNT
    docker compose up app-prod
    ```
 
-2. Access the app at http://localhost:3000
+2. Access the app at http://localhost:3001
+
+**Note:** The production service runs the same Vite dev server but without volume mounting for hot-reload, making it suitable for containerized deployments.
 
 ### Docker Commands
 
@@ -63,6 +65,11 @@ View your app in AI Studio: https://ai.studio/apps/drive/1moLFr1cwG3FVjsf0PGWmNT
 - Run production container:
   ```bash
   docker compose up app-prod
+  ```
+
+- Run both services simultaneously:
+  ```bash
+  docker compose up
   ```
 
 - Stop containers:
