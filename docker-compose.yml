@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Development service
+  app-dev:
+    build:
+      context: .
+      target: development
+    container_name: project-planner-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    stdin_open: true
+    tty: true
+
+  # Production service
+  app-prod:
+    build:
+      context: .
+      target: production
+    container_name: project-planner-prod
+    ports:
+      - "8080:80"
+    restart: unless-stopped
