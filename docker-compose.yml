@@ -1,0 +1,30 @@
+services:
+  # Development service (with hot-reload)
+  app-dev:
+    build:
+      context: .
+    container_name: project-planner-dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    command: npm run dev
+    stdin_open: true
+    tty: true
+
+  # Production-like service (without hot-reload, different port)
+  # Note: Uses 'npm run dev' because this app loads dependencies from CDN
+  # and doesn't require a traditional build/bundle step
+  app-prod:
+    build:
+      context: .
+    container_name: project-planner-prod
+    ports:
+      - "3001:3000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    command: npm run dev
+    restart: unless-stopped
