@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tab, Day, UserState, KanbanItem, Task, SubTask, SkillCategory, BrainDumpItem, JournalEntry } from './types';
 import { INITIAL_CURRICULUM, INITIAL_KANBAN, LEVEL_THRESHOLD, ACHIEVEMENTS_LIST } from './constants';
-import { IconCheck, IconWand, IconTrophy, IconLock, IconSettings, IconList, IconKanban, IconMessage, IconBrain, IconSpark, IconRefresh, IconHammer, IconBook, IconBadge, IconBriefcase } from './components/Icons';
+import { IconCheck, IconWand, IconTrophy, IconLock, IconSettings, IconList, IconKanban, IconMessage, IconBrain, IconSpark, IconRefresh, IconHammer, IconBook, IconBadge, IconBriefcase, IconCpu } from './components/Icons';
 import Pomodoro from './components/Pomodoro';
 import Kanban from './components/Kanban';
 import ChatBot from './components/ChatBot';
@@ -16,8 +16,17 @@ import ChronoLog from './components/ChronoLog';
 import CareerConsole from './components/CareerConsole';
 import { breakDownTaskWithAI, generateCurriculum } from './services/geminiService';
 
+const ACCESS_CODE = "Pedram9112@9112";
+
 const App: React.FC = () => {
-  // --- State ---
+  // --- Auth State ---
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    return localStorage.getItem('pm_mission_control_auth') === 'true';
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [authError, setAuthError] = useState(false);
+
+  // --- App State ---
   const [activeTab, setActiveTab] = useState<Tab>(Tab.CURRICULUM);
   const [selectedDayId, setSelectedDayId] = useState<number>(1);
   const [showDebriefDayId, setShowDebriefDayId] = useState<number | null>(null);
@@ -96,6 +105,18 @@ const App: React.FC = () => {
   }, [userState.stats, userState.completedTaskIds, userState.verifiedDayIds, curriculum]);
 
   // --- Actions ---
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (passwordInput === ACCESS_CODE) {
+      setIsAuthenticated(true);
+      localStorage.setItem('pm_mission_control_auth', 'true');
+      setAuthError(false);
+    } else {
+      setAuthError(true);
+      setPasswordInput('');
+    }
+  };
+
   const handleCompleteTask = (task: Task, isSubTask = false) => {
     if (userState.completedTaskIds.includes(task.id)) return;
 
@@ -217,6 +238,55 @@ const App: React.FC = () => {
   const selectedDay = curriculum.find(d => d.id === selectedDayId);
   const isDayVerified = selectedDay ? userState.verifiedDayIds.includes(selectedDay.id) : false;
 
+  // --- Lock Screen Render ---
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-space-900 text-slate-100 flex items-center justify-center font-sans relative overflow-hidden">
+        {/* Background Grid */}
+        <div className="absolute inset-0 pointer-events-none opacity-10" 
+               style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
+        </div>
+        
+        <div className="bg-slate-900/80 p-8 md:p-12 rounded-2xl border border-neon-cyan/50 shadow-[0_0_50px_rgba(6,182,212,0.2)] max-w-md w-full backdrop-blur-md relative z-10 animate-fade-in flex flex-col items-center">
+          <div className="mb-8 p-4 bg-neon-cyan/10 rounded-full border border-neon-cyan shadow-[0_0_20px_rgba(6,182,212,0.4)]">
+            <IconLock className="w-12 h-12 text-neon-cyan" />
+          </div>
+          
+          <h1 className="text-3xl font-mono font-bold text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan to-neon-pink mb-2 text-center">
+            MISSION CONTROL
+          </h1>
+          <p className="text-slate-400 text-sm mb-8 font-mono tracking-widest uppercase">Security Clearance Required</p>
+          
+          <form onSubmit={handleLogin} className="w-full space-y-4">
+            <div>
+              <input 
+                type="password" 
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="ENTER ACCESS CODE"
+                className={`w-full bg-slate-950 border text-center font-mono text-lg tracking-widest p-4 rounded-lg focus:outline-none transition-all placeholder:text-slate-700 ${authError ? 'border-red-500 text-red-400 shake' : 'border-slate-700 text-white focus:border-neon-cyan focus:shadow-[0_0_15px_rgba(6,182,212,0.3)]'}`}
+                autoFocus
+              />
+              {authError && <p className="text-red-500 text-xs font-mono mt-2 text-center">ACCESS DENIED. INVALID CREDENTIALS.</p>}
+            </div>
+            
+            <button 
+              type="submit"
+              className="w-full bg-neon-cyan text-slate-900 font-bold font-mono py-4 rounded-lg hover:bg-white hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 active:scale-95"
+            >
+              INITIALIZE SYSTEM
+            </button>
+          </form>
+          
+          <div className="mt-6 text-[10px] text-slate-600 font-mono">
+            SECURE LOGIN
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Main App Render ---
   return (
     <div className="min-h-screen bg-space-900 text-slate-100 flex flex-col md:flex-row font-sans selection:bg-neon-cyan selection:text-black">
       
@@ -488,6 +558,13 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+               <div className="bg-slate-800/50 p-6 rounded-xl border border-white/5">
+                 <h3 className="text-lg font-bold text-white mb-2">ACCESS CONTROL</h3>
+                 <button onClick={() => { localStorage.removeItem('pm_mission_control_auth'); setIsAuthenticated(false); }} className="px-4 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded hover:bg-red-500 hover:text-white transition-colors">
+                    LOCK TERMINAL (LOGOUT)
+                 </button>
+               </div>
             </div>
           )}
 
