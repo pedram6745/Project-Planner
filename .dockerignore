@@ -31,10 +31,6 @@ dist-ssr
 .DS_Store
 Thumbs.db
 
-# Documentation
-README.md
-*.md
-
 # Testing
 coverage
 .nyc_output

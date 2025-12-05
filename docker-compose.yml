@@ -16,6 +16,8 @@ services:
     tty: true
 
   # Production-like service (without hot-reload, different port)
+  # Note: Uses 'npm run dev' because this app loads dependencies from CDN
+  # and doesn't require a traditional build/bundle step
   app-prod:
     build:
       context: .
